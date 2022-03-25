@@ -5,6 +5,8 @@ from time import sleep
 import re
 import spacy
 nlp = spacy.load("ja_ginza")
+import platform
+
 
 
 def load_str(path):
@@ -18,9 +20,9 @@ class PaitSub:
         self.rg_stat = [] 
         self.v_stat  = [] 
         for n in range(5, n_level-1, -1):
-            self.g_stat.append(load_str(f'n{n}G').splitlines())    
-            self.rg_stat.append(load_str(f'n{n}Gr').splitlines())   
-            self.v_stat.append(load_str(f'n{n}V').splitlines())    
+            self.g_stat.append(load_str(f'ndata{slesh_line}n{n}G').splitlines())    
+            self.rg_stat.append(load_str(f'ndata{slesh_line}n{n}Gr').splitlines())   
+            self.v_stat.append(load_str(f'ndata{slesh_line}n{n}V').splitlines())    
         self.g_palette = ['#fafa6e', '#f7ca3d', '#f09819', '#e3630e', '#d01919'][:5-n_level+1]
         self.v_palette = ['#82fa6e', '#00deb9', '#00b7ff', '#0082ff', '#6f19d0'][:5-n_level+1]
 
@@ -69,9 +71,15 @@ class PaitSub:
         return new_corpus
 
 def main():
-    str_path = '/home/nikita/Downloads/Sono_Bisque_Doll_wa_Koi_wo_Suru/My.Dress-Up.Darling.S01E06.WEBRip.Netflix.ja[cc].srt'
+    if platform.system() == 'Linux':
+        slesh_line = '/'
+    else:
+        slesh_line = '\\'
+
+    # str_path = '/home/nikita/Downloads/Sono_Bisque_Doll_wa_Koi_wo_Suru/My.Dress-Up.Darling.S01E06.WEBRip.Netflix.ja[cc].srt'
+    str_path = input('path to the srt subtitles: ')
     # str_path = '/home/nikita/Downloads/n/1-26/10.srt'
-    
+    str_path = str_path + slesh_line
     str_data = load_str(str_path)
 
     P = PaitSub(3)
