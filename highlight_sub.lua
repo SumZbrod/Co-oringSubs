@@ -120,24 +120,15 @@ end
 local function highlight_subs()
     local _, track = get_active_track('sub')
     local file_path = track.external and track['external-filename'] or extract_to_file(track)
-    -- os.execute"python "...file_path
     local cwd = os.getenv("PWD")..'/'
     local codec_parser_map = { ass = sub.ASS, subrip = sub.SRT }
     local parser = codec_parser_map[track['codec']]
-    -- local exe_command = "python ~/.config/mpv/scripts/subscoloring/coloring_subs.py "..cwd..file_path 
-    local exe_command = "python ~/.config/mpv/scripts/subscoloring/coloring_subs.py "..'"'..file_path..'"' 
-    -- print(1)
-    -- print(cwd)
-    -- print(file_path)
+    local exe_command = "python ~/.config/mpv/scripts/Co-oringSubs/coloring_subs.py "..'"'..file_path..'"' 
 
-    -- print("python ~/.config/mpv/scripts/subscoloring/coloring_subs.py "..file_path)
-    -- print(1)
     file_path = file_path:gsub('file://', '')
-    -- print(mkfp_c(file_path))
-    -- print(exe_command)
-    notify("Coloring...")
+
+    notify("Coloring...", nil, 5)
     os.execute(exe_command)
-    -- print(file_path)
 
     local s = parser:populate(mkfp_c(file_path))
 

@@ -25,7 +25,7 @@ def get_slesh():
 class PaitSub:
     def __init__(self, n_level=4):
         slesh_line = get_slesh()
-        cwd = slesh_line.join(os.getcwd().split(slesh_line)[:3])+'/.config/mpv/scripts/subscoloring/'.replace('/', slesh_line)
+        cwd = slesh_line.join(os.getcwd().split(slesh_line)[:3])+'/.config/mpv/scripts/Co-oringSubs/'.replace('/', slesh_line)
         self.n_level = n_level
         self.g_stat  = [] 
         self.rg_stat = [] 
@@ -106,6 +106,7 @@ def main():
     new_corpus = P.coloring(str_data, sub_ex)
 
     new_path =  subs_path[:-4] + '_c.' + sub_ex
+    print('new_path: ', new_path)
     with open(new_path, 'w') as f:
         f.write(new_corpus)
 
