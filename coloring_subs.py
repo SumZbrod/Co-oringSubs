@@ -1,15 +1,10 @@
-import pandas as pd
-import pickle
-import requests
 from time import sleep
 import re
 import spacy
-nlp = spacy.load("ja_ginza")
 import platform
 import argparse
 import os
-import subprocess
-import sys 
+nlp = spacy.load("ja_ginza")
 
 def load_str(path):
     with open(path) as f:
@@ -22,10 +17,14 @@ def get_slesh():
         slesh_line = '\\'
     return slesh_line
 
-class PaitSub:
+class PaintSub:
     def __init__(self, n_level=4):
         slesh_line = get_slesh()
-        cwd = slesh_line.join(os.getcwd().split(slesh_line)[:3])+'/.config/mpv/scripts/Co-oringSubs/'.replace('/', slesh_line)
+        if slesh_line == '/':
+            cwd_part = '/.config/mpv/scripts/Co-oringSubs/'
+        else: 
+            cwd_part = f'C:/Users/{os.getlogin()}/AppData/Roaming/mpv/scripts/Co-oringSubs'
+        cwd = slesh_line.join(os.getcwd().split(slesh_line)[:3])+cwd_part
         self.n_level = n_level
         self.g_stat  = [] 
         self.rg_stat = [] 
@@ -34,8 +33,8 @@ class PaitSub:
             self.g_stat.append(load_str( f'{cwd}ndata{slesh_line}n{n}G').splitlines())    
             self.rg_stat.append(load_str(f'{cwd}ndata{slesh_line}n{n}Gr').splitlines())   
             self.v_stat.append(load_str( f'{cwd}ndata{slesh_line}n{n}V').splitlines())    
-        self.g_palette = ['#fafa6e', '#f7ca3d', '#f09819', '#e3630e', '#d01919'][:5-n_level+1]
-        self.v_palette = ['#82fa6e', '#00deb9', '#00b7ff', '#0082ff', '#6f19d0'][:5-n_level+1]
+        self.v_palette = ['#fafa6e', '#f7ca3d', '#f09819', '#e3630e', '#d01919'][:5-n_level+1]
+        self.g_palette = ['#82fa6e', '#00deb9', '#00b7ff', '#0082ff', '#6f19d0'][:5-n_level+1]
 
     def coloring(self, corpus, sub_ex):
         new_corpus = ''
@@ -90,7 +89,6 @@ class PaitSub:
         return new_corpus
 
 def main():
-    
     slesh_line = get_slesh()
     parser = argparse.ArgumentParser()
     parser.add_argument("subs_path")
@@ -99,9 +97,9 @@ def main():
     subs_path = subs_path
     if 'file://' in subs_path:
         subs_path = subs_path[7:]
-    str_data = load_str(subs_path)
+    str_data = load_str(subs_path.replace('%20', ' '))
 
-    P = PaitSub(3)
+    P = PaintSub(3)
 
     new_corpus = P.coloring(str_data, sub_ex)
 
