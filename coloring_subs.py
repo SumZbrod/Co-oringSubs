@@ -29,6 +29,7 @@ class PaintSub:
         self.g_stat  = [] 
         self.rg_stat = [] 
         self.v_stat  = [] 
+    
         for n in range(5, n_level-1, -1):
             self.g_stat.append(load_str( f'{cwd}ndata{slesh_line}n{n}G').splitlines())    
             self.rg_stat.append(load_str(f'{cwd}ndata{slesh_line}n{n}Gr').splitlines())   
@@ -36,7 +37,21 @@ class PaintSub:
         self.v_palette = ['#fafa6e', '#f7ca3d', '#f09819', '#e3630e', '#d01919'][:5-n_level+1]
         self.g_palette = ['#82fa6e', '#00deb9', '#00b7ff', '#0082ff', '#6f19d0'][:5-n_level+1]
 
-    def coloring(self, corpus, sub_ex):
+        self.specs = ['…', ' ']
+
+    def replace_spec(self, line):
+        for i, s in enumerate(self.specs):
+            line = line.replace(s, f'{i}ð')
+        return line
+    
+
+    def dereplace_spec(self, line):
+        for i, s in enumerate(self.specs):
+            line = line.replace(f'{i}ð', s)
+        return line
+
+
+    def coloring(self, corpus, sub_ex='srt'):
         new_corpus = ''
         g_count = [0] * (6-self.n_level)
         v_count = [0] * (6-self.n_level)
@@ -49,36 +64,35 @@ class PaintSub:
                 if sub_ex == 'ass':
                     line = line.split(',,')[-1]
                     pre_line = ',,'.join(line.split(',,')[:-1])
-                # print(line)
-                line = line.replace('…', 'ð')
+
+                line = self.replace_spec(line)
                 doc = nlp(line)
                 new_line = ''
                 for token in doc.to_json()['tokens']:
                     # print(token['tag'], end=' ')
                     # print('\t', token['morph'])
                     phrase = line[token['start']: token['end']]
-                    lemma = token['lemma']
+                    token_lemma = token['lemma']
                     for n in range(6-self.n_level):
-                        if lemma in self.g_stat[n]:
+                        if token_lemma in self.g_stat[n]:
                             # print(lemma)
-                            lemma = f'<font color="{self.g_palette[n]}">{phrase}</font>'
+                            phrase = f'<font color="{self.g_palette[n]}">{phrase}</font>'
                             g_count[n] += 1
                             break
-                        elif lemma in self.v_stat[n]:
+                        elif token_lemma in self.v_stat[n]:
                             v_count[n] += 1
                             # print(lemma)
-                            lemma = f'<font color="{self.v_palette[n]}">{phrase}</font>'
+                            phrase = f'<font color="{self.v_palette[n]}">{phrase}</font>'
                             break
-                    new_line += lemma
+                    new_line += phrase
                 for n in range(6-self.n_level):
                     for r_g in self.rg_stat[n]:
                         # print(r_g)
                         for part in re.findall(r_g, new_line):
                             new_line = new_line.replace(part, f'<font color="{self.g_palette[n]}">{part}</font>')
                             g_count[n] += 1
-                new_line = new_line.replace('ð', '…')
-                
 
+                new_line = self.dereplace_spec(new_line)
             else:
                 new_line = line
             if flag_preparing and sub_ex == 'ass':
@@ -94,7 +108,7 @@ def main():
     parser.add_argument("subs_path")
     subs_path = parser.parse_args().subs_path
     sub_ex = subs_path[-3:]
-    subs_path = subs_path
+    print(subs_path)
     if 'file://' in subs_path:
         subs_path = subs_path[7:]
     str_data = load_str(subs_path.replace('%20', ' '))
@@ -111,3 +125,4 @@ def main():
 
 if __name__ == '__main__':
     main() 
+
